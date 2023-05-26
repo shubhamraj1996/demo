@@ -1,6 +1,46 @@
-hello karad
-how are you guys
-fine
-not good
-well all is well
-baba ranchod
+const http=require ('http');
+const mysql=require ('mysql');
+
+var server=http.createServer((request,response)=>
+{
+    console.log("Request recieved for"+request.url);
+
+    var connection=mysql.createConnection({
+        host: 'localhost',
+        user: 'root',
+        password:'manager',
+        database:'dac'
+    });
+
+    response.setHeader("Access-Control-Allow-Origin","*")
+
+    if(request.url=="/emp")
+    {
+        connection.query("select * from EMP",(error,result)=>
+        {
+            if(error==null)
+            {
+                var data=JSON.stringify(result);
+                //console.log(data);
+                response.setHeader("content-type","application/json");
+                response.write(data);
+                connection.end();
+                response.end();
+            }
+            else
+            {
+                var errdata=JSON.stringify(error);
+                //console.log(errdata);
+                response.write(errdata);
+                connection.end();
+                response.end();
+            }
+        });
+    }
+else
+{
+    response.write("No Data");
+    response.end();
+}
+})
+server.listen(9898,()=>{console.log("Server Started")});
